@@ -8,10 +8,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from src.LookInDark import LookInDark
+from model import SeeInDark
 
-# input_dir = '../Digital-Visual-Effects-master/final/dataset/Sony/short/'
-# gt_dir = '../Digital-Visual-Effects-master/final/dataset/Sony/long/'
 input_dir = './dataset/Sony/short/'
 gt_dir = './dataset/Sony/long/'
 m_path = './saved_model/'
@@ -36,8 +34,6 @@ for i in range(len(test_fns)):
 
 def pack_raw(raw):
     #pack Bayer image to 4 channels
-    im = raw.raw_image_visible.astype(np.float32) 
-    im = im[:1024, :1024]
     im = np.maximum(im - 512,0)/ (16383 - 512) #subtract the black level
 
     im = np.expand_dims(im,axis=2) 
@@ -53,7 +49,7 @@ def pack_raw(raw):
 
 
 
-model = LookInDark()
+model = SeeInDark()
 model.load_state_dict(torch.load( m_path + m_name ,map_location={'cuda:1':'cuda:0'}))
 model = model.to(device)
 if not os.path.isdir(result_dir):
@@ -74,11 +70,12 @@ for test_id in test_ids:
         ratio = min(gt_exposure/in_exposure,300)
 
         raw = rawpy.imread(in_path)
-        input_full = np.expand_dims(pack_raw(raw),axis=0) *ratio
+        im = raw.raw_image_visible.astype(np.float32) 
+        im = im[:1024, :1024]
+        input_full = np.expand_dims(pack_raw(im),axis=0) *ratio
 
         im = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
         im = im[:1024, :1024]
-        #scale_full = np.expand_dims(np.float32(im/65535.0),axis = 0)*ratio
         scale_full = np.expand_dims(np.float32(im/65535.0),axis = 0)	
 
         gt_raw = rawpy.imread(gt_path)

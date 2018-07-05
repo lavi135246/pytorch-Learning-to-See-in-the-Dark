@@ -8,12 +8,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from src.LookInDark import LookInDark
+from model import SeeInDark
 
 input_dir = './dataset/Sony/short/'
 gt_dir = './dataset/Sony/long/'
-# input_dir = '../Digital-Visual-Effects-master/final/dataset/Sony/short/'
-# gt_dir = '../Digital-Visual-Effects-master/final/dataset/Sony/long/'
 result_dir = './result_Sony/'
 model_dir = './saved_model/'
 
@@ -79,7 +77,7 @@ for folder in allfolders:
     lastepoch = np.maximum(lastepoch, int(folder[-4:]))
 
 learning_rate = 1e-4
-model = LookInDark().to(device)
+model = SeeInDark().to(device)
 model._initialize_weights()
 opt = optim.Adam(model.parameters(), lr = learning_rate)
 for epoch in range(lastepoch,4001):
@@ -90,13 +88,12 @@ for epoch in range(lastepoch,4001):
         for g in opt.param_groups:
             g['lr'] = 1e-5
   
-    #for ind in np.arange(len(train_ids)):
+
     for ind in np.random.permutation(len(train_ids)):
         # get the path from image id
         train_id = train_ids[ind]
         in_files = glob.glob(input_dir + '%05d_00*.ARW'%train_id)
         in_path = in_files[np.random.random_integers(0,len(in_files)-1)]
-        #in_path = in_files[0]
         _, in_fn = os.path.split(in_path)
 
         gt_files = glob.glob(gt_dir + '%05d_00*.ARW'%train_id)
@@ -128,7 +125,6 @@ for epoch in range(lastepoch,4001):
         gt_patch = gt_images[ind][:,yy*2:yy*2+ps*2,xx*2:xx*2+ps*2,:]
        
 
-        
         if np.random.randint(2,size=1)[0] == 1:  # random flip 
             input_patch = np.flip(input_patch, axis=1)
             gt_patch = np.flip(gt_patch, axis=1)
@@ -149,12 +145,11 @@ for epoch in range(lastepoch,4001):
 
         model.zero_grad()
         out_img = model(in_img)
+
         loss = reduce_mean(out_img, gt_img)
         loss.backward()
-        #print('Loss:', loss)
+
         opt.step()
-        # _,G_current,output=sess.run([G_opt,G_loss,out_image],feed_dict={in_image:input_patch,gt_image:gt_patch,lr:learning_rate})
-        # output = np.minimum(np.maximum(output,0),1)
         g_loss[ind]=loss.data
 
         #print("%d %d Loss=%.3f Time=%.3f"%(epoch,cnt,np.mean(g_loss[np.where(g_loss)]),time.time()-st))
@@ -164,8 +159,6 @@ for epoch in range(lastepoch,4001):
                 os.makedirs(result_dir + '%04d'%epoch)
             output = out_img.permute(0, 2, 3, 1).cpu().data.numpy()
             output = np.minimum(np.maximum(output,0),1)
-            
-            #gt_out = gt_img.permute(0, 2, 3, 1).cpu().data.numpy()
             
             temp = np.concatenate((gt_patch[0,:,:,:], output[0,:,:,:]),axis=1)
             scipy.misc.toimage(temp*255,  high=255, low=0, cmin=0, cmax=255).save(result_dir + '%04d/%05d_00_train_%d.jpg'%(epoch,train_id,ratio))

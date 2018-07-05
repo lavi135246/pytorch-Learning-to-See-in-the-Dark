@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class LookInDark(nn.Module):
+class SeeInDark(nn.Module):
     def __init__(self, num_classes=10):
-        super(LookInDark, self).__init__()
+        super(SeeInDark, self).__init__()
         
         #device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.conv1_1 = nn.Conv2d(4, 32, kernel_size=3, stride=1, padding=1)
