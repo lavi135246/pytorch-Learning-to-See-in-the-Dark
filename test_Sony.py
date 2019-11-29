@@ -16,7 +16,7 @@ m_path = './saved_model/'
 m_name = 'checkpoint_sony_e4000.pth'
 result_dir = './test_result_Sony/'
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 #get test IDs
 test_fns = glob.glob(gt_dir + '/1*.ARW')
 test_ids = []
@@ -65,16 +65,13 @@ for test_id in test_ids:
 
         raw = rawpy.imread(in_path)
         im = raw.raw_image_visible.astype(np.float32) 
-        #im = im[:1024, :1024]
         input_full = np.expand_dims(pack_raw(im),axis=0) *ratio
 
         im = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
-        im = im[:1024, :1024]
         scale_full = np.expand_dims(np.float32(im/65535.0),axis = 0)	
 
         gt_raw = rawpy.imread(gt_path)
         im = gt_raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
-        im = im[:1024, :1024]
         gt_full = np.expand_dims(np.float32(im/65535.0),axis = 0)
 
         input_full = np.minimum(input_full,1.0)
