@@ -17,13 +17,7 @@ m_name = 'checkpoint_sony_e4000.pth'
 result_dir = './test_result_Sony/'
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-#get train and test IDs
-train_fns = glob.glob(gt_dir + '0*.ARW')
-train_ids = []
-for i in range(len(train_fns)):
-    _, train_fn = os.path.split(train_fns[i])
-    train_ids.append(int(train_fn[0:5]))
-
+#get test IDs
 test_fns = glob.glob(gt_dir + '/1*.ARW')
 test_ids = []
 for i in range(len(test_fns)):
