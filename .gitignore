@@ -1,4 +1,6 @@
 __pycache__/
-#*.png
+*.png
 *.ARW
 *.pth
+dataset/
+test_result_Sony/

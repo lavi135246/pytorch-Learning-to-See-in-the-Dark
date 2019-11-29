@@ -34,7 +34,7 @@ for i in range(len(test_fns)):
 
 def pack_raw(raw):
     #pack Bayer image to 4 channels
-    im = np.maximum(im - 512,0)/ (16383 - 512) #subtract the black level
+    im = np.maximum(raw - 512,0)/ (16383 - 512) #subtract the black level
 
     im = np.expand_dims(im,axis=2) 
     img_shape = im.shape
@@ -71,7 +71,7 @@ for test_id in test_ids:
 
         raw = rawpy.imread(in_path)
         im = raw.raw_image_visible.astype(np.float32) 
-        im = im[:1024, :1024]
+        #im = im[:1024, :1024]
         input_full = np.expand_dims(pack_raw(im),axis=0) *ratio
 
         im = raw.postprocess(use_camera_wb=True, half_size=False, no_auto_bright=True, output_bps=16)
