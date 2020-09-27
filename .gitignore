@@ -4,3 +4,4 @@ __pycache__/
 *.pth
 dataset/
 test_result_Sony/
+result_Sony/

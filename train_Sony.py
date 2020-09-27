@@ -19,6 +19,8 @@ result_dir = './result_Sony/'
 model_dir = './saved_model/'
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+print(f"Device: {device}")
+
 #get train and test IDs
 train_fns = glob.glob(gt_dir + '0*.ARW')
 train_ids = []
@@ -96,7 +98,7 @@ for epoch in range(lastepoch,4001):
         # get the path from image id
         train_id = train_ids[ind]
         in_files = glob.glob(input_dir + '%05d_00*.ARW'%train_id)
-        in_path = in_files[np.random.random_integers(0,len(in_files)-1)]
+        in_path = in_files[np.random.randint(0,len(in_files))]
         _, in_fn = os.path.split(in_path)
 
         gt_files = glob.glob(gt_dir + '%05d_00*.ARW'%train_id)
@@ -132,8 +134,8 @@ for epoch in range(lastepoch,4001):
             input_patch = np.flip(input_patch, axis=1)
             gt_patch = np.flip(gt_patch, axis=1)
         if np.random.randint(2,size=1)[0] == 1: 
-            input_patch = np.flip(input_patch, axis=0)
-            gt_patch = np.flip(gt_patch, axis=0)
+            input_patch = np.flip(input_patch, axis=2)
+            gt_patch = np.flip(gt_patch, axis=2)
         if np.random.randint(2,size=1)[0] == 1:  # random transpose 
             input_patch = np.transpose(input_patch, (0,2,1,3))
             gt_patch = np.transpose(gt_patch, (0,2,1,3))
@@ -144,7 +146,6 @@ for epoch in range(lastepoch,4001):
         
         in_img = torch.from_numpy(input_patch).permute(0,3,1,2).to(device)
         gt_img = torch.from_numpy(gt_patch).permute(0,3,1,2).to(device)
-        
 
         model.zero_grad()
         out_img = model(in_img)
@@ -153,17 +154,21 @@ for epoch in range(lastepoch,4001):
         loss.backward()
 
         opt.step()
-        g_loss[ind]=loss.data
+        g_loss[ind]=loss.data.cpu()
 
-        #print("%d %d Loss=%.3f Time=%.3f"%(epoch,cnt,np.mean(g_loss[np.where(g_loss)]),time.time()-st))
-        
+        mean_loss = np.mean(g_loss[np.where(g_loss)])
+        print(f"Epoch: {epoch} \t Count: {cnt} \t Loss={mean_loss:.3} \t Time={time.time()-st:.3}")
+
         if epoch%save_freq==0:
-            if not os.path.isdir(result_dir + '%04d'%epoch):
-                os.makedirs(result_dir + '%04d'%epoch)
+            epoch_result_dir = result_dir + f'{epoch:04}/'
+
+            if not os.path.isdir(epoch_result_dir):
+                os.makedirs(epoch_result_dir)
+
             output = out_img.permute(0, 2, 3, 1).cpu().data.numpy()
             output = np.minimum(np.maximum(output,0),1)
             
             temp = np.concatenate((gt_patch[0,:,:,:], output[0,:,:,:]),axis=1)
-            Image.fromarray((temp*255).astype('uint8')).save(result_dir + '%04d/%05d_00_train_%d.jpg'%(epoch,train_id,ratio))
+            Image.fromarray((temp*255).astype('uint8')).save(epoch_result_dir + f'{train_id:05}_00_train_{ratio}.jpg')
             torch.save(model.state_dict(), model_dir+'checkpoint_sony_e%04d.pth'%epoch)
 
