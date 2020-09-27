@@ -11,15 +11,23 @@ Chen Chen, Qifeng Chen, Jia Xu, and Vladlen Koltun, "Learning to See in the Dark
 ## Requirements
 - 64 GB RAM
 - GTX 1080
-- PyTorch 0.4.0
-- RawPy 0.10
-- Scipy
+- PyTorch >= 0.4.0 (1.0.0 and 1.6.0  are also tested)
+- RawPy >= 0.10 (0.15 is also tested)
 
-The program have been tested on Ubuntu 16.04 and Windows 10.
+The program have been tested on Ubuntu 18.04, 16.04, and Windows 10.
 
 ## Download Dataset
-Download `download_dataset.py` from the [original code](https://github.com/cchen156/Learning-to-See-in-the-Dark) and put it in the top level directory of this project and execute:
-`python download_dataset.py`
+Download the dataset following the instruction in the [original code](https://github.com/cchen156/Learning-to-See-in-the-Dark) and unzip it under the directory `dataset`.
+
+```
+pytorch-Learning-to-See-in-the-Dark
+  ├── dataset
+  │   ├── image-here
+  │   ├── Sony
+  │   │   ├── long
+  |   │   ├── short
+  .   .   .
+```
 
 ## Training
 `python train_Sony.py`

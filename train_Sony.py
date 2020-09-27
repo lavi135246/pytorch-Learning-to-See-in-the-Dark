@@ -1,4 +1,5 @@
-import os,time,scipy.io
+import os
+import time
 
 import numpy as np
 import rawpy
@@ -7,6 +8,8 @@ import glob
 import torch
 import torch.nn as nn
 import torch.optim as optim
+
+from PIL import Image
 
 from model import SeeInDark
 
@@ -161,6 +164,6 @@ for epoch in range(lastepoch,4001):
             output = np.minimum(np.maximum(output,0),1)
             
             temp = np.concatenate((gt_patch[0,:,:,:], output[0,:,:,:]),axis=1)
-            scipy.misc.toimage(temp*255,  high=255, low=0, cmin=0, cmax=255).save(result_dir + '%04d/%05d_00_train_%d.jpg'%(epoch,train_id,ratio))
+            Image.fromarray((temp*255).astype('uint8')).save(result_dir + '%04d/%05d_00_train_%d.jpg'%(epoch,train_id,ratio))
             torch.save(model.state_dict(), model_dir+'checkpoint_sony_e%04d.pth'%epoch)
 
