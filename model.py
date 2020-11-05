@@ -4,6 +4,13 @@ import torch.nn.functional as F
 
 class SeeInDark(nn.Module):
     def __init__(self, num_classes=10):
+        """
+        Initialize the convolutional layer.
+
+        Args:
+            self: (todo): write your description
+            num_classes: (int): write your description
+        """
         super(SeeInDark, self).__init__()
         
         #device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -45,6 +52,13 @@ class SeeInDark(nn.Module):
         self.conv10_1 = nn.Conv2d(32, 12, kernel_size=1, stride=1)
     
     def forward(self, x):
+        """
+        Perform forward forward algorithm.
+
+        Args:
+            self: (todo): write your description
+            x: (todo): write your description
+        """
         conv1 = self.lrelu(self.conv1_1(x))
         conv1 = self.lrelu(self.conv1_2(conv1))
         pool1 = self.pool1(conv1)
@@ -89,6 +103,12 @@ class SeeInDark(nn.Module):
         return out
 
     def _initialize_weights(self):
+        """
+        Initialize the weights.
+
+        Args:
+            self: (todo): write your description
+        """
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 m.weight.data.normal_(0.0, 0.02)
@@ -98,5 +118,12 @@ class SeeInDark(nn.Module):
                 m.weight.data.normal_(0.0, 0.02)
 
     def lrelu(self, x):
+        """
+        Lrelu function.
+
+        Args:
+            self: (todo): write your description
+            x: (todo): write your description
+        """
         outt = torch.max(0.2*x, x)
         return outt
