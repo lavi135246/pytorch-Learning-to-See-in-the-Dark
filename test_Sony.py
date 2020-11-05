@@ -30,6 +30,12 @@ for i in range(len(test_fns)):
 
 
 def pack_raw(raw):
+    """
+    Pack the raw data as a numpy array.
+
+    Args:
+        raw: (bool): write your description
+    """
     #pack Bayer image to 4 channels
     im = np.maximum(raw - 512,0)/ (16383 - 512) #subtract the black level
 

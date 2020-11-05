@@ -46,6 +46,12 @@ if DEBUG == 1:
     test_ids = test_ids[0:5]
 
 def pack_raw(raw):
+    """
+    Pack raw image into a numpy array.
+
+    Args:
+        raw: (bool): write your description
+    """
     #pack Bayer image to 4 channels
     im = raw.raw_image_visible.astype(np.float32) 
     im = np.maximum(im - 512,0)/ (16383 - 512) #subtract the black level
@@ -62,6 +68,13 @@ def pack_raw(raw):
     return out
 
 def reduce_mean(out_im, gt_im):
+    """
+    Reduce the mean value.
+
+    Args:
+        out_im: (int): write your description
+        gt_im: (int): write your description
+    """
     return torch.abs(out_im - gt_im).mean()
 
 
